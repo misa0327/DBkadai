@@ -1,21 +1,5 @@
 import sqlite3
 
-def get_grade(score):
-    """
-    得点に基づいて評価を決定
-    """
-    if score >= 90:
-        return "秀"
-    elif score >= 80:
-        return "優"
-    elif score >= 70:
-        return "良"
-    elif score >= 60:
-        return "可"
-    elif score >= 50:
-        return "不可"
-    else:
-        return "欠席"  # 得点が50未満の場合は欠席とみなす
 
 def calculate_gpa(student_id):
 #指定された学生IDのGPA、取得単位数、不足単位数を計算
@@ -51,12 +35,11 @@ def calculate_gpa(student_id):
     else:
         gpa = 0
 
+    calculate_and_update_rank()
+
     connection.close()
     return gpa
     # GPA計算後に順位を更新する処理
-    calculate_and_update_rank()
-
-
 
 
     # 不足単位数の計算
@@ -71,26 +54,6 @@ def calculate_gpa(student_id):
     connection.close()
     return gpa, total_earned_credits, remaining_credits
 
-
-def calculate_and_update_rank():
-    connection = sqlite3.connect('university.db')
-    cursor = connection.cursor()
-
-    # すべての学生のGPAを降順に並べて取得
-    cursor.execute('''SELECT student_id, gpa FROM users ORDER BY gpa DESC''')
-    students = cursor.fetchall()
-
-    # 順位を計算してusersテーブルを更新
-    rank = 1
-    for student in students:
-        student_id = student[0]
-        # 順位を更新
-        cursor.execute('''UPDATE users SET rank = ? WHERE student_id = ?''', (rank, student_id))
-        rank += 1
-
-    # 変更を保存
-    connection.commit()
-    connection.close()
 
 if __name__ == "__main__":
     student_id = input("Enter student ID: ")
