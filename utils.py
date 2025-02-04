@@ -1,4 +1,6 @@
 #utils.py
+import sqlite3
+
 def get_grade(score):
     """
     得点に基づいて評価を決定

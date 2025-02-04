@@ -18,10 +18,11 @@ def insert_sample_data():
     cursor.executemany('''INSERT INTO subjects (subject_name, credits) VALUES (?, ?)''', subjects)
 
     # 生徒情報の挿入 (評価、取得単位、不足単位は計算で決定されるのでNoneを設定)
+    ## GPA、total_credits、remaining_creditsは計算後に設定されるため、データ挿入時に None にしておく
     students = [
-        ('S12345', '田中太郎', 'password123', None, None, None, None),  # GPA、取得単位、不足単位は計算
-        ('S12346', '佐藤花子', 'password456', None, None, None, None),  # GPA、取得単位、不足単位は計算
-        ('S12347', '鈴木一郎', 'password789', None, None, None, None),  # GPA、取得単位、不足単位は計算
+        ('g2342001', '田中太郎', 'password123', None, None, None, None),  # GPA、取得単位、不足単位は計算
+        ('g2242014', '佐藤花子', 'password456', None, None, None, None),  # GPA、取得単位、不足単位は計算
+        ('g2342078', '鈴木一郎', 'password789', None, None, None, None),  # GPA、取得単位、不足単位は計算
     ]
     
     cursor.executemany('''INSERT INTO users (student_id, name, password, gpa, rank, total_credits, remaining_credits) 
@@ -29,25 +30,32 @@ def insert_sample_data():
 
     # 履修情報の挿入
     enrollments = [
-        ('S12345', 1, 80, '優'),  # 田中太郎: データベース
-        ('S12345', 2, 75, '優'),  # 田中太郎: 電子商取引論
-        ('S12345', 3, 60, '可'),  # 田中太郎: 線形代数学
-        ('S12346', 1, 70, '良'),  # 佐藤花子: データベース
-        ('S12346', 2, 85, '秀'),  # 佐藤花子: 電子商取引論
-        ('S12346', 4, 55, '不可'), # 佐藤花子: 人工知能
-        ('S12347', 1, 65, '可'),  # 鈴木一郎: データベース
-        ('S12347', 3, 80, '優'),  # 鈴木一郎: 線形代数学
-        ('S12347', 5, 90, '秀')   # 鈴木一郎: 英語
+        ('g2342001', 1, 80, None),  # 田中太郎: データベース
+        ('g2342001', 2, 75, None),  # 田中太郎: 電子商取引論
+        ('g2342001', 3, 60, None),  # 田中太郎: 線形代数学
+        ('g2242014', 1, 70, None),  # 佐藤花子: データベース
+        ('g2242014', 2, 85, None),  # 佐藤花子: 電子商取引論
+        ('g2242014', 4, 55, None), # 佐藤花子: 人工知能
+        ('g2342078', 1, None, None),  # 鈴木一郎: データベース
+        ('g2342078', 3, 80, None),  # 鈴木一郎: 線形代数学
+        ('g2342078', 5, 90, None)   # 鈴木一郎: 英語
     ]
+    # 成績を計算して `grade` カラムにセット
+    enrollments_with_grades = [(student_id, subject_id, score, get_grade(score)) for student_id, subject_id, score in enrollments]
     
     cursor.executemany('''INSERT INTO enrollments (student_id, subject_id, score, grade) 
-                           VALUES (?, ?, ?, ?)''', enrollments)
+                           VALUES (?, ?, ?, ?)''', enrollments_with_grades)
 
     # 変更を保存
     connection.commit()
+
+    # 各学生のGPAや取得単位数、順位を計算して更新
+    for student in students:
+        student_id = student[0]
+        calculate_gpa_and_credits(student_id)  # GPAと単位数の計算
+
     connection.close()
-
-    print("Sample data inserted successfully.")
-
+    
 if __name__ == "__main__":
     insert_sample_data()
+    print("Sample data inserted successfully.")

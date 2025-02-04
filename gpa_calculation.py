@@ -53,9 +53,3 @@ GP=(科目の得点-50)/10
 
     return gpa, total_earned_credits, remaining_credits
 
-if __name__ == "__main__":
-    student_id = input("Enter student ID: ")
-    gpa, earned_credits, remaining_credits = calculate_gpa_and_credits(student_id)
-    print(f"GPA for student {student_id}: {gpa:.2f}")
-    print(f"Earned Credits: {earned_credits}")
-    print(f"Remaining Credits for Graduation: {remaining_credits}")
