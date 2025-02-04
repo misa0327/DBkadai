@@ -1,8 +1,11 @@
+#utils.py
 def get_grade(score):
     """
     得点に基づいて評価を決定
     """
-    if score >= 90:
+    if score is None:
+        return "欠席"
+    elif score >= 90:
         return "秀"
     elif score >= 80:
         return "優"
@@ -10,7 +13,5 @@ def get_grade(score):
         return "良"
     elif score >= 60:
         return "可"
-    elif score >= 50:
-        return "不可"
     else:
-        return "欠席"  # 得点が50未満の場合は欠席とみなす
+        return "不可"  # 60点未満は不可

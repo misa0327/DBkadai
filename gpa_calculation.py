@@ -1,59 +1,57 @@
+#gpa_calculation.py
 import sqlite3
+from rank_calculation import calculate_and_update_rank  # 順位計算をインポート
 
-
-def calculate_gpa(student_id):
-#指定された学生IDのGPA、取得単位数、不足単位数を計算
-#GPA=履修した各科目のGP*単位数の合計/履修登録した単位数の合計
-#GP＝（科目の得点-50）/10
+def calculate_gpa_and_credits(student_id):
+"""
+指定された学生IDのGPA、取得単位数、不足単位数を計算
+GPA=履修した各科目のGP*単位数の合計/履修登録した単位数の合計
+GP=(科目の得点-50)/10
+"""
     connection = sqlite3.connect('university.db')
     cursor = connection.cursor()
 
-    # 学生IDに関連する全ての科目情報を取得
-    #subjectsテーブルから、欠席でない科目の得点と単位数を取得
-    cursor.execute('''SELECT credits, score FROM subjects WHERE student_id = ? AND grade != '欠席' ''', (student_id,))
-    subjects = cursor.fetchall()
+    #学生IDに関連する全ての科目情報を取得
+    #enrollmentsテーブルから、欠席でない科目の得点と単位数を取得
+    cursor.execute('''SELECT s.credits, e.score 
+                      FROM enrollments e
+                      JOIN subjects s ON e.subject_id = s.subject_id
+                      WHERE e.student_id = ? AND e.grade != '欠席' ''', (student_id,))
+    enrollments = cursor.fetchall()
 
-    total_weighted_score = 0 #GPA計算に使用する加重スコア
-    total_credits = 0 #学生が履修した層単位数
-    total_earned_credits = 0 # 取得単位数
+    total_weighted_score = 0    #GPA計算用
+    total_credits = 0           #履修単位数
+    total_earned_credits = 0    #取得単位数
 
-
-    for subject in subjects:
-        credits, score = subject
-        grade = get_grade(score)
-        
-        # 欠席の場合はGPA計算に含めない
-        if grade != "欠席":
-            gp = (score - 50) / 10 if score >= 60 else 0  # GP計算
-            total_weighted_score += gp * credits
-            total_credits += credits
+    for credits, score in enrollments:
+        gp = (score - 50) / 10 if score >= 60 else 0  # GPAの計算
+        total_weighted_score += gp * credits
+        total_credits += credits
+        if score >= 60:
             total_earned_credits += credits  # 取得単位数を加算
-
-    # GPA計算
-    if total_credits > 0:
-        gpa = total_weighted_score / total_credits
-    else:
-        gpa = 0
-
-    calculate_and_update_rank()
-
-    connection.close()
-    return gpa
-    # GPA計算後に順位を更新する処理
+    
+     # GPA計算
+    gpa = (total_weighted_score / total_credits) if total_credits > 0 else 0
 
 
-    # 不足単位数の計算
-    required_credits = 124
+    # 不足単位の計算
+    required_credits = 124  # 卒業に必要な単位数
     remaining_credits = required_credits - total_earned_credits
 
-    # 取得したGPA、取得単位数、残り単位数をusersテーブルに更新
+
+    # GPA・取得単位数・不足単位数をデータベースに更新
     cursor.execute('''UPDATE users SET gpa = ?, total_credits = ?, remaining_credits = ? WHERE student_id = ?''', 
                    (gpa, total_earned_credits, remaining_credits, student_id))
+    
+
+    # データベースに変更を反映
     connection.commit()
-
     connection.close()
-    return gpa, total_earned_credits, remaining_credits
 
+    # 順位を更新
+    calculate_and_update_rank()
+
+    return gpa, total_earned_credits, remaining_credits
 
 if __name__ == "__main__":
     student_id = input("Enter student ID: ")
