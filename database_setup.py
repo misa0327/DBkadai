@@ -17,9 +17,9 @@ def create_database():
     #科目情報: 科目ごとにIDを設定し、科目名や単位数を統一
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS subjects (
-        subject_id INTEGER PRIMARY KEY,  # 科目ID(主キー)
-        subject_name TEXT NOT NULL,      # 科目名
-        credits INTEGER NOT NULL         # 単位数  
+        subject_id INTEGER PRIMARY KEY,  -- 科目ID(主キー)
+        subject_name TEXT NOT NULL,      -- 科目名
+        credits INTEGER NOT NULL         -- 単位数  
     );
     ''')
 
@@ -27,13 +27,13 @@ def create_database():
     #生徒情報: 生徒の基本情報（GPAや順位を含む）を保存し、履修情報とは分ける。
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS users (
-        student_id TEXT PRIMARY KEY,  # 学生ID (主キー)
-        name TEXT NOT NULL,           # 氏名
-        password TEXT NOT NULL,       # パスワード
-        gpa REAL,                     # GPA
-        rank INTEGER,                 # 順位
-        total_credits INTEGER DEFAULT 0, # 取得単位数
-        remaining_credits INTEGER DEFAULT 124 # 不足単位数
+        student_id TEXT PRIMARY KEY,  -- 学生ID (主キー)
+        name TEXT NOT NULL,           -- 氏名
+        password TEXT NOT NULL,       -- パスワード
+        gpa REAL,                     -- GPA
+        rank INTEGER,                 -- 順位
+        total_credits INTEGER DEFAULT 0, -- 取得単位数
+        remaining_credits INTEGER DEFAULT 124 -- 不足単位数
     );
     ''')    
 
@@ -41,11 +41,11 @@ def create_database():
     #履修情報: 生徒ごとに履修した科目の情報（成績・評価）を保存する。
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS enrollments (
-        enrollment_id INTEGER PRIMARY KEY AUTOINCREMENT, # 履修ID(主キー)
-        student_id TEXT NOT NULL,  # 生徒ID(外部キー)
-        subject_id INTEGER NOT NULL, # 科目ID(外部キー)
-        score INTEGER,              # 成績（点数）
-        grade TEXT,                 # 評価（秀、優、良、可、不可、欠席）
+        enrollment_id INTEGER PRIMARY KEY AUTOINCREMENT, -- 履修ID(主キー)
+        student_id TEXT NOT NULL,  -- 生徒ID(外部キー)
+        subject_id INTEGER NOT NULL, -- 科目ID(外部キー)
+        score INTEGER,              -- 成績（点数）
+        grade TEXT,                 -- 評価（秀、優、良、可、不可、欠席）
         FOREIGN KEY (student_id) REFERENCES users(student_id),
         FOREIGN KEY (subject_id) REFERENCES subjects(subject_id)
     );
