@@ -15,7 +15,7 @@ def insert_sample_data():
         (5, '英語', 1)
     ]
     
-    cursor.executemany('''INSERT INTO subjects (subject_name, credits) VALUES (?, ?)''', subjects)
+    cursor.executemany('''INSERT INTO subjects (subject_id, subject_name, credits) VALUES (?, ?, ?)''', subjects)
 
     # 生徒情報の挿入 (評価、取得単位、不足単位は計算で決定されるのでNoneを設定)
     ## GPA、total_credits、remaining_creditsは計算後に設定されるため、データ挿入時に None にしておく
@@ -40,6 +40,8 @@ def insert_sample_data():
         ('g2342078', 3, 80, None),  # 鈴木一郎: 線形代数学
         ('g2342078', 5, 90, None)   # 鈴木一郎: 英語
     ]
+    
+    from your_module import get_grade  # get_grade を適切にインポート
     # 成績を計算して `grade` カラムにセット
     enrollments_with_grades = [(student_id, subject_id, score, get_grade(score)) for student_id, subject_id, score in enrollments]
     
