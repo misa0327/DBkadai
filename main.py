@@ -26,22 +26,25 @@ def get_student_info(student_id, password):
 
 
 def main():
-    # ユーザからIDとパスワードを入力
-    student_id = input("Enter student ID: ")
-    password = input("Enter password: ")  
+    while True:
+        # ユーザからIDとパスワードを入力
+        student_id = input("Enter student ID: ")
+        password = input("Enter password: ")  
 
-    # パスワードが適切か確認
-    student_info = get_student_info(student_id, password)
+        # パスワードが適切か確認
+        student_info = get_student_info(student_id, password)
 
-    if student_info:
-        name, gpa, rank, total_credits, remaining_credits = student_info
-        print(f"{name} さん")
-        print(f"GPA: {gpa:.2f}")
-        print(f"順位: {rank}")
-        print(f"取得単位数: {total_credits}")
-        print(f"不足単位数: {remaining_credits}")
-    else:
-        print("Invalid student ID or password!")
+        if student_info:
+            name, gpa, rank, total_credits, remaining_credits = student_info
+            print(f"{name} さん")
+            print(f"GPA: {gpa:.2f}")
+            print(f"順位: {rank}")
+            print(f"取得単位数: {total_credits}")
+            print(f"不足単位数: {remaining_credits}")
+            break  # 有効な情報が入力された場合、ループを終了
+        else:
+            print("Invalid student ID or password!")
+            print("Please try again.")
 
 if __name__ == "__main__":
     main()
