@@ -48,6 +48,7 @@ def create_database():
         grade TEXT,                 -- 評価（秀、優、良、可、不可、欠席）
         FOREIGN KEY (student_id) REFERENCES users(student_id),
         FOREIGN KEY (subject_id) REFERENCES subjects(subject_id)
+        CONSTRAINT unique_student_subject UNIQUE (student_id, subject_id)  -- 生徒IDと科目IDの組み合わせを一意にする制約
     );
     """)
     
@@ -55,8 +56,34 @@ def create_database():
     # 必要に応じて他のテーブルを作成する処理を追加
     #変更を保存
     connection.commit()
+
+   
+
     #データベース接続のクローズ
     connection.close()
+
+
+def remove_duplicates(connection):
+    cursor = connection.cursor()
+
+    # 重複した履修データを削除
+    cursor.execute('''
+    WITH duplicates AS (
+        SELECT enrollment_id
+        FROM (
+            SELECT enrollment_id,
+                   ROW_NUMBER() OVER (PARTITION BY student_id, subject_id ORDER BY enrollment_id) AS row_num
+            FROM enrollments
+        )
+        WHERE row_num > 1
+    )
+    DELETE FROM enrollments WHERE enrollment_id IN (SELECT enrollment_id FROM duplicates);
+    ''')
+
+    # 変更を保存
+    connection.commit()
+
+
 
 if __name__ == "__main__":
     create_database()

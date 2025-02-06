@@ -3,11 +3,11 @@ import sqlite3
 from rank_calculation import calculate_and_update_rank  # 順位計算をインポート
 
 def calculate_gpa_and_credits(student_id):
-"""
-指定された学生IDのGPA、取得単位数、不足単位数を計算
-GPA=履修した各科目のGP*単位数の合計/履修登録した単位数の合計
-GP=(科目の得点-50)/10
-"""
+
+#指定された学生IDのGPA、取得単位数、不足単位数を計算
+#GPA=履修した各科目のGP*単位数の合計/履修登録した単位数の合計
+#GP=(科目の得点-50)/10
+
     connection = sqlite3.connect('university.db')
     cursor = connection.cursor()
 
@@ -30,8 +30,8 @@ GP=(科目の得点-50)/10
         if score >= 60:
             total_earned_credits += credits  # 取得単位数を加算
     
-     # GPA計算
-    gpa = (total_weighted_score / total_credits) if total_credits > 0 else 0
+     # GPA計算 小数第３位を四捨五入
+    gpa = round((total_weighted_score / total_credits), 1) if total_credits > 0 else 0
 
 
     # 不足単位の計算
@@ -52,4 +52,3 @@ GP=(科目の得点-50)/10
     calculate_and_update_rank()
 
     return gpa, total_earned_credits, remaining_credits
-

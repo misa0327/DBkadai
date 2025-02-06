@@ -1,10 +1,16 @@
 #insert_sample.py
 import sqlite3
+from gpa_calculation import calculate_gpa_and_credits #gpa_calculationのインポート
+from utils import get_grade  # get_grade を適切にインポート
+from database_setup import remove_duplicates
+
 
 def insert_sample_data():
     # データベース接続
     connection = sqlite3.connect('university.db')
     cursor = connection.cursor()
+
+
 
     # 科目情報の挿入
     subjects = [
@@ -15,7 +21,10 @@ def insert_sample_data():
         (5, '英語', 1)
     ]
     
-    cursor.executemany('''INSERT INTO subjects (subject_id, subject_name, credits) VALUES (?, ?, ?)''', subjects)
+    # 重複を防ぐために INSERT OR IGNORE を使う
+    cursor.executemany('''INSERT OR IGNORE INTO subjects (subject_id, subject_name, credits) VALUES (?, ?, ?)''', subjects)
+
+
 
     # 生徒情報の挿入 (評価、取得単位、不足単位は計算で決定されるのでNoneを設定)
     ## GPA、total_credits、remaining_creditsは計算後に設定されるため、データ挿入時に None にしておく
@@ -25,7 +34,7 @@ def insert_sample_data():
         ('g2342078', '鈴木一郎', 'password789', None, None, None, None),  # GPA、取得単位、不足単位は計算
     ]
     
-    cursor.executemany('''INSERT INTO users (student_id, name, password, gpa, rank, total_credits, remaining_credits) 
+    cursor.executemany('''INSERT OR IGNORE INTO users (student_id, name, password, gpa, rank, total_credits, remaining_credits) 
                            VALUES (?, ?, ?, ?, ?, ?, ?)''', students)
 
     # 履修情報の挿入
@@ -41,11 +50,10 @@ def insert_sample_data():
         ('g2342078', 5, 90, None)   # 鈴木一郎: 英語
     ]
     
-    from your_module import get_grade  # get_grade を適切にインポート
     # 成績を計算して `grade` カラムにセット
-    enrollments_with_grades = [(student_id, subject_id, score, get_grade(score)) for student_id, subject_id, score in enrollments]
+    enrollments_with_grades = [(student_id, subject_id, score, get_grade(score)) for student_id, subject_id, score, _ in enrollments]
     
-    cursor.executemany('''INSERT INTO enrollments (student_id, subject_id, score, grade) 
+    cursor.executemany('''INSERT OR IGNORE INTO enrollments (student_id, subject_id, score, grade) 
                            VALUES (?, ?, ?, ?)''', enrollments_with_grades)
 
     # 変更を保存
@@ -55,6 +63,9 @@ def insert_sample_data():
     for student in students:
         student_id = student[0]
         calculate_gpa_and_credits(student_id)  # GPAと単位数の計算
+
+     # 重複データを削除
+    remove_duplicates(connection)
 
     connection.close()
     
