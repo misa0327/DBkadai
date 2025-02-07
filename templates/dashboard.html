@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        h1 {
+            color: #5c6bc0;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 2px solid #5c6bc0;
+            border-radius: 10px;
+            background-color: #e8eaf6;
+        }
+        button {
+            background-color: #5c6bc0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            margin: 10px 0;
+            cursor: pointer;
+            width: 200px;
+        }
+        button:hover {
+            background-color: #3f4b8b;
+        }
+        .table {
+            margin-top: 30px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+            border-collapse: collapse;
+        }
+        .table th, .table td {
+            border: 1px solid #5c6bc0;
+            padding: 10px;
+            text-align: center;
+        }
+        .table th {
+            background-color: #5c6bc0;
+            color: white;
+        }
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .language-button {
+            background-color: #9c27b0;
+            color: white;
+            padding: 8px 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .language-button:hover {
+            background-color: #7b1fa2;
+        }
+    </style>
+    <script>
+        function toggleDisplay(id) {
+            var element = document.getElementById(id);
+            if (element.style.display === "none" || element.style.display === "") {
+                element.style.display = "block";
+            } else {
+                element.style.display = "none";
+            }
+        }
+
+        function toggleLanguage() {
+            var lang = document.documentElement.lang;
+            var elements = document.querySelectorAll("[data-ja], [data-en]");
+
+            if (lang === "ja") {
+                document.documentElement.lang = "en";
+                elements.forEach(el => {
+                    el.innerText = el.getAttribute("data-ja");
+                });
+            } else {
+                document.documentElement.lang = "ja";
+                elements.forEach(el => {
+                    el.innerText = el.getAttribute("data-en");
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h1 data-ja="ようこそ、{{ student_name }}さん！" data-en="Welcome, {{ student_name }}!">ようこそ、{{ student_name }}さん！</h1>
+
+        <div class="section">
+            <h2 data-ja="GPA: {{ gpa }}" data-en="GPA: {{ gpa }}">GPA: {{ gpa }}</h2>
+            <h2 data-ja="順位: {{ rank }}" data-en="Rank: {{ rank }}">順位: {{ rank }}</h2>
+        </div>
+
+        <div class="section">
+            <button onclick="toggleDisplay('credits-table')" data-ja="取得単位数と不足単位数" data-en="Credits & Deficits">取得単位数と不足単位数</button>
+            <button onclick="toggleDisplay('grades-table')" data-ja="成績" data-en="Grades">成績</button>
+        </div>
+
+        <!-- 取得単位数と不足単位数 -->
+        <div id="credits-table" class="section" style="display:none;">
+            <h3 data-ja="取得単位数と不足単位数" data-en="Credits & Deficits">取得単位数と不足単位数</h3>
+            <table class="table">
+                <tr>
+                    <th data-ja="取得単位数" data-en="Earned Credits">取得単位数</th>
+                    <th data-ja="不足単位数" data-en="Deficit Credits">不足単位数</th>
+                </tr>
+                <tr>
+                    <td>{{ earned_credits }}</td>
+                    <td>{{ remaining_credits }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 成績 -->
+        <div id="grades-table" class="section" style="display:none;">
+            <h3 data-ja="成績" data-en="Grades">成績</h3>
+            <table class="table">
+                <tr>
+                    <th data-ja="科目名" data-en="Subject">科目名</th>
+                    <th data-ja="成績" data-en="Grade">成績</th>
+                </tr>
+                {% for subject, grade in grades %}
+                    <tr>
+                        <td>{{ subject }}</td>
+                        <td>{{ grade }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <button class="language-button" onclick="toggleLanguage()" data-ja="English" data-en="日本語">English</button>
+    </div>
+
+</body>
+</html>
