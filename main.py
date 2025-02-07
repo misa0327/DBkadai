@@ -1,14 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
+from insert_sample_data import insert_sample_data  # insert_sample_data.pyから関数をインポート
 
 app = Flask(__name__)
+
+# アプリケーション起動時にサンプルデータを挿入
+insert_sample_data()  # main.pyが起動した際にサンプルデータを挿入
 
 # 学生情報を取得する関数
 def get_student_info(student_id, password=None):
     connection = sqlite3.connect('university.db')
     cursor = connection.cursor()
     
-    # パスワードが渡されていない場合（ダッシュボード表示）学生IDだけで検索
     if password:
         cursor.execute(''' 
         SELECT name, gpa, rank, total_credits, remaining_credits 
@@ -38,12 +41,10 @@ def get_student_info(student_id, password=None):
     connection.close()
     return None
 
-# トップページのルート
 @app.route("/")
 def index():
     return redirect(url_for("login"))
 
-# ログイン画面のルート
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -58,7 +59,6 @@ def login():
     
     return render_template("login.html")
 
-# ダッシュボード画面のルート
 @app.route("/dashboard/<student_id>")
 def dashboard(student_id):
     student_info = get_student_info(student_id, password=None)  # パスワードなし
