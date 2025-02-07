@@ -32,6 +32,7 @@ def insert_sample_data():
         ('g2342001', '田中太郎', 'password123', None, None, None, None),  # GPA、取得単位、不足単位は計算
         ('g2242014', '佐藤花子', 'password456', None, None, None, None),  # GPA、取得単位、不足単位は計算
         ('g2342078', '鈴木一郎', 'password789', None, None, None, None),  # GPA、取得単位、不足単位は計算
+        ('g2341008', '青山輝樹', 'password321', None, None, None, None)
     ]
     
     cursor.executemany('''INSERT OR IGNORE INTO users (student_id, name, password, gpa, rank, total_credits, remaining_credits) 
@@ -47,7 +48,10 @@ def insert_sample_data():
         ('g2242014', 4, 55, None), # 佐藤花子: 人工知能
         ('g2342078', 1, None, None),  # 鈴木一郎: データベース
         ('g2342078', 3, 80, None),  # 鈴木一郎: 線形代数学
-        ('g2342078', 5, 90, None)   # 鈴木一郎: 英語
+        ('g2342078', 5, 90, None),   # 鈴木一郎: 英語
+        ('g2341008', 2, 95, None),
+        ('g2341008', 4, 85, None),
+        ('g2341008', 5, 90, None)
     ]
     
     # 成績を計算して `grade` カラムにセット
