@@ -35,7 +35,7 @@ class StudentApp:
         connection = sqlite3.connect('university.db')
         cursor = connection.cursor()
         
-        cursor.execute('''
+        cursor.execute(''' 
         SELECT name, gpa, rank, total_credits, remaining_credits 
         FROM users
         WHERE student_id = ? AND password = ?
@@ -44,7 +44,7 @@ class StudentApp:
         student_info = cursor.fetchone()
         
         if student_info:
-            cursor.execute('''
+            cursor.execute(''' 
             SELECT subjects.subject_name, enrollments.grade
             FROM enrollments
             JOIN subjects ON enrollments.subject_id = subjects.subject_id
@@ -99,6 +99,7 @@ class MainApp:
             self.btn_credits.config(text="View Credits")
             self.btn_grades.config(text="View Grades")
             self.btn_language.config(text="日本語")
+            self.btn_logout.config(text="Logout")  # ログアウトボタンのテキストを英語に変更
         else:
             self.language = "jp"
             self.label_welcome.config(text=f"ようこそ, {self.student_info[0]}")
@@ -106,6 +107,7 @@ class MainApp:
             self.btn_credits.config(text="単位数を見る")
             self.btn_grades.config(text="成績を見る")
             self.btn_language.config(text="English")
+            self.btn_logout.config(text="ログアウト")  # ログアウトボタンのテキストを日本語に変更
     
     def show_gpa_rank(self):
         window = tk.Toplevel(self.root)
