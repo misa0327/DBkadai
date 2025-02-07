@@ -1,9 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 import sqlite3
+from insert_sample_data import insert_sample_data  # insert_sample_data関数をインポート
 
 class StudentApp:
     def __init__(self, root):
+        # 最初にサンプルデータを挿入
+        insert_sample_data()
+
         self.root = root
         self.root.title("Student Login")
         self.root.geometry("400x250")
