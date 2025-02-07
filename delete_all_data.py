@@ -7,7 +7,7 @@ conn = sqlite3.connect('university.db')
 cursor = conn.cursor()
 
 # テーブルのデータを削除
-cursor.execute("DELETE FROM users;")
+cursor.execute("DELETE FROM enrollments;")
 
 # 変更を保存
 conn.commit()

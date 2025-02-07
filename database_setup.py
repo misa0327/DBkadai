@@ -68,21 +68,22 @@ def remove_duplicates(connection):
 
     # 重複した履修データを削除
     cursor.execute('''
-    WITH duplicates AS (
-        SELECT enrollment_id
-        FROM (
-            SELECT enrollment_id,
-                   ROW_NUMBER() OVER (PARTITION BY student_id, subject_id ORDER BY enrollment_id) AS row_num
-            FROM enrollments
-        )
-        WHERE row_num > 1
-    )
-    DELETE FROM enrollments WHERE enrollment_id IN (SELECT enrollment_id FROM duplicates);
-    ''')
+        DELETE FROM enrollments
+            WHERE enrollment_id NOT IN (
+                SELECT MIN(enrollment_id)
+                FROM enrollments
+                GROUP BY student_id, subject_id
+            );
+        ''')
+
+    # enrollment_id のシーケンスをリセット
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='enrollments';")
 
     # 変更を保存
     connection.commit()
 
+    # VACUUM を実行して ID を詰める
+    cursor.execute("VACUUM;")
 
 
 if __name__ == "__main__":
